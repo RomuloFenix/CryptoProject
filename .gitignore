@@ -1,0 +1,25 @@
+# === DIRECTORIOS DE COMPILACIÓN ===
+build/
+*/build/
+/*build*/
+
+# === ARCHIVOS DE CONFIGURACIÓN LOCAL ===
+CMakeUserPresets.json
+*.user
+
+# === ARCHIVOS GENERADOS POR PYTHON ===
+*.pyc
+__pycache__/
+
+# === DEPENDENCIAS COMPILADAS ===
+depends/work/
+depends/built/
+
+# === ARCHIVOS TEMPORALES Y DE RESPALDO ===
+*.log
+*.tmp
+*.bak
+*~
+.DS_Store
+
+.vscode
