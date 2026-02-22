@@ -1837,14 +1837,37 @@ PackageMempoolAcceptResult ProcessNewPackage(Chainstate& active_chainstate, CTxM
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+    /*int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
     // Force block reward to zero when right shift is undefined.
     if (halvings >= 64)
         return 0;
 
     CAmount nSubsidy = 100 * COIN;
     // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
+    nSubsidy >>= halvings;*/
+    const CAmount BASE_REWARD = 150 * COIN;
+    const double DECAY_RATE = 0.8334;
+    const int MAX_ERA = 10;
+    const CAmount MIN_REWARD = 25 * COIN;
+
+    int nEra = 0;
+    int nAccumulateBlocks = 0;
+    int nNextThreshold = 4;
+
+    while(nHeight >= nAccumulateBlocks + nNextThreshold){
+        nAccumulateBlocks += nNextThreshold;
+        nEra++;
+        nNextThreshold *= 4;
+    }
+
+    double dRewardInCoins = (static_cast<double>(BASE_REWARD) / COIN) * pow(DECAY_RATE, nEra);
+    double dRounded = std::round(dRewardInCoins * 100) / 100;
+    CAmount nSubsidy = static_cast<CAmount>(dRounded * COIN + 0.5);
+
+    if (nSubsidy <= MIN_REWARD) {
+        nSubsidy = MIN_REWARD;
+    }
+
     return nSubsidy;
 }
 
