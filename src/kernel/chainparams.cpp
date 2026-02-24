@@ -22,6 +22,7 @@
 #include <util/strencodings.h>
 
 #include <algorithm>
+#include <iostream>
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -67,8 +68,8 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks";
-    const CScript genesisOutputScript = CScript() << "04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f"_hex << OP_CHECKSIG;
+    const char* pszTimestamp = "The economy of this world is the network 23/02/2026";
+    const CScript genesisOutputScript = CScript() << "03b27b74afdaf67d1337608750993a7c778c092a791340c72d9ab4de33b33d28e5"_hex << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
@@ -131,10 +132,12 @@ public:
         m_assumed_blockchain_size = 810;
         m_assumed_chain_state_size = 14;
 
-        genesis = CreateGenesisBlock(1231006505, 2083236893, 0x1d00ffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1770800000, 2048, 0x207fffff, 1, 150 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256{"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"});
-        assert(genesis.hashMerkleRoot == uint256{"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"});
+        std::cout<<"Hash Genesis MAIN "<<consensus.hashGenesisBlock.ToString()<<std::endl;
+        std::cout<<"Hash merkle MAIN "<<genesis.hashMerkleRoot.ToString()<<std::endl;
+        assert(consensus.hashGenesisBlock == uint256{"b7db4ee341658bfd0981ebc26be677fec936de7abaeb39f394c8b7299d6749af"});
+        assert(genesis.hashMerkleRoot == uint256{"74187bcf2ec5d0323fa2abb130921d6fde09541f7b2360278ce876652b254632"});
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
@@ -150,11 +153,11 @@ public:
         vSeeds.emplace_back("seed.bitcoin.wiz.biz."); // Jason Maurice
         vSeeds.emplace_back("seed.mainnet.achownodes.xyz.");*/ // Ava Chow, only supports x1, x5, x9, x49, x809, x849, xd, x400, x404, x408, x448, xc08, xc48, x40c
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,0);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,128);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,199);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,222);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,95);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x19, 0xA5, 0x29};
+        base58Prefixes[EXT_SECRET_KEY] = {0x07, 0x49, 0xF5, 0x2C};
 
         bech32_hrp = "bc";
 
@@ -246,15 +249,17 @@ public:
         pchMessageStart[1] = 0x38;
         pchMessageStart[2] = 0xa4;
         pchMessageStart[3] = 0xe1;
-        nDefaultPort = 25725;
+        nDefaultPort = 22725;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 240;
         m_assumed_chain_state_size = 19;
 
-        genesis = CreateGenesisBlock(1296688602, 414098458, 0x1d00ffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1771000000, 1024, 0x207fffff, 1, 150 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256{"000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"});
-        assert(genesis.hashMerkleRoot == uint256{"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"});
+        std::cout<<"Hash Genesis TESTNET "<<consensus.hashGenesisBlock.ToString()<<std::endl;
+        std::cout<<"Hash merkle TESTNET "<<genesis.hashMerkleRoot.ToString()<<std::endl;
+        assert(consensus.hashGenesisBlock == uint256{"820dc4342bd026be71feb2c6317670d56b11d482a8785558106990b21a79aa46"});
+        assert(genesis.hashMerkleRoot == uint256{"74187bcf2ec5d0323fa2abb130921d6fde09541f7b2360278ce876652b254632"});
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -265,11 +270,11 @@ public:
         vSeeds.emplace_back("testnet-seed.bluematt.me."); // Just a static list of stable node(s), only supports x9
         vSeeds.emplace_back("seed.testnet.achownodes.xyz."); // Ava Chow, only supports x1, x5, x9, x49, x809, x849, xd, x400, x404, x408, x448, xc08, xc48, x40c
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,239);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,199);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,222);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,95);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x19, 0xA5, 0x29};
+        base58Prefixes[EXT_SECRET_KEY] = {0x07, 0x49, 0xF5, 0x2C};
 
         bech32_hrp = "tb";
 
@@ -353,18 +358,12 @@ public:
         m_assumed_blockchain_size = 22;
         m_assumed_chain_state_size = 2;
 
-        const char* testnet4_genesis_msg = "03/May/2024 000000000000000000001ebd58c244970b3aa9d783bb001011fbe8ea8e98e00e";
-        const CScript testnet4_genesis_script = CScript() << "000000000000000000000000000000000000000000000000000000000000000000"_hex << OP_CHECKSIG;
-        genesis = CreateGenesisBlock(testnet4_genesis_msg,
-                testnet4_genesis_script,
-                1714777860,
-                393743547,
-                0x1d00ffff,
-                1,
-                50 * COIN);
+        genesis = CreateGenesisBlock(1771200000, 512, 0x207fffff, 1, 150 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256{"00000000da84f2bafbbc53dee25a72ae507ff4914b867c565be350b0da8bf043"});
-        assert(genesis.hashMerkleRoot == uint256{"7aa0a7ae1e223414cb807e40cd57e667b718e42aaf9306db9102fe28912b7b4e"});
+        std::cout<<"Hash Genesis TESTNET4 "<<consensus.hashGenesisBlock.ToString()<<std::endl;
+        std::cout<<"Hash merkle TESTNET4 "<<genesis.hashMerkleRoot.ToString()<<std::endl;
+        assert(consensus.hashGenesisBlock == uint256{"4412b9b085a1e63192c2dc7cef446c5ff74ad4536a838bb47603307187075e42"});
+        assert(genesis.hashMerkleRoot == uint256{"74187bcf2ec5d0323fa2abb130921d6fde09541f7b2360278ce876652b254632"});
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -372,11 +371,11 @@ public:
         vSeeds.emplace_back("seed.testnet4.bitcoin.sprovoost.nl."); // Sjors Provoost
         vSeeds.emplace_back("seed.testnet4.wiz.biz."); // Jason Maurice
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,239);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,199);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,222);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,95);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x19, 0xA5, 0x29};
+        base58Prefixes[EXT_SECRET_KEY] = {0x07, 0x49, 0xF5, 0x2C};
 
         bech32_hrp = "tb";
 
@@ -495,10 +494,12 @@ public:
         nDefaultPort = 0;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1598918400, 52613770, 0x1e0377ae, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1771400000, 256, 0x207fffff, 1, 150 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256{"00000008819873e925422c1ff0f99f7cc9bbb232af63a077a480a3633bee1ef6"});
-        assert(genesis.hashMerkleRoot == uint256{"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"});
+        std::cout<<"Hash Genesis SIGNET "<<consensus.hashGenesisBlock.ToString()<<std::endl;
+        std::cout<<"Hash merkle SIGNET "<<genesis.hashMerkleRoot.ToString()<<std::endl;
+        assert(consensus.hashGenesisBlock == uint256{"ffeda156ae08caf1d70a3990df786f87e93741a5277d5071544b121004589324"});
+        assert(genesis.hashMerkleRoot == uint256{"74187bcf2ec5d0323fa2abb130921d6fde09541f7b2360278ce876652b254632"});
 
         m_assumeutxo_data = {
             {
@@ -509,11 +510,11 @@ public:
             }
         };
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,239);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,199);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,222);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,95);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x19, 0xA5, 0x29};
+        base58Prefixes[EXT_SECRET_KEY] = {0x07, 0x49, 0xF5, 0x2C};
 
         bech32_hrp = "tb";
 
@@ -576,7 +577,7 @@ public:
         pchMessageStart[1] = 0x39;
         pchMessageStart[2] = 0xa5;
         pchMessageStart[3] = 0xd1;
-        nDefaultPort = 37725;
+        nDefaultPort = 28825;
         nPruneAfterHeight = opts.fastprune ? 100 : 1000;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
@@ -607,10 +608,12 @@ public:
             consensus.vDeployments[deployment_pos].min_activation_height = version_bits_params.min_activation_height;
         }
 
-        genesis = CreateGenesisBlock(1296688602, 2, 0x207fffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1771600000, 4, 0x207fffff, 1, 150 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256{"0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"});
-        assert(genesis.hashMerkleRoot == uint256{"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"});
+        std::cout<<"Hash Genesis REGTEST "<<consensus.hashGenesisBlock.ToString()<<std::endl;
+        std::cout<<"Hash merkle REGTEST "<<genesis.hashMerkleRoot.ToString()<<std::endl;
+        assert(consensus.hashGenesisBlock == uint256::FromHex("1d8e684183c946ca2cca94bc5b52bc34eb95a96fb1828720ac1fd8ddda67003c"));
+        assert(genesis.hashMerkleRoot == uint256::FromHex("74187bcf2ec5d0323fa2abb130921d6fde09541f7b2360278ce876652b254632"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();
@@ -648,11 +651,11 @@ public:
             .dTxRate = 0.001, // Set a non-zero rate to make it testable
         };
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,239);
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
-        base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,199);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,222);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,95);
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x19, 0xA5, 0x29};
+        base58Prefixes[EXT_SECRET_KEY] = {0x07, 0x49, 0xF5, 0x2C};
 
         bech32_hrp = "bcrt";
 
