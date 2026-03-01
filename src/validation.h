@@ -1396,4 +1396,19 @@ bool IsBIP30Unspendable(const uint256& block_hash, int block_height);
 // Returns the script flags which should be checked for a given block
 script_verify_flags GetBlockScriptFlags(const CBlockIndex& block_index, const ChainstateManager& chainman);
 
+
+// Validation Nodes
+
+struct ActiveNode{
+    uint256 nodeId;
+    std::string direccionIP;
+    int64_t lastBlockProcess;
+    int activitie;
+    int activeBlocks;
+    bool isRewardForCicle;
+};
+
+extern std::map<uint256, ActiveNode> mapActiveNodes;
+extern RecursiveMutex cs_activenodes; 
+
 #endif // BITCOIN_VALIDATION_H

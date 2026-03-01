@@ -16,6 +16,7 @@
 #include <validation.h>
 #include <validationinterface.h>
 #include <versionbits.h>
+#include <sync.h>
 
 #include <algorithm>
 #include <memory>

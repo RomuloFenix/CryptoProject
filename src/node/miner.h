@@ -12,6 +12,7 @@
 #include <primitives/block.h>
 #include <txmempool.h>
 #include <util/feefrac.h>
+#include <validation.h>
 
 #include <cstdint>
 #include <memory>
@@ -89,6 +90,9 @@ public:
     };
 
     explicit BlockAssembler(Chainstate& chainstate, const CTxMemPool* mempool, const Options& options);
+    // Validation Nodes
+    void addRewardForActivitie(const std::vector<ActiveNode>& activeNodes, CBlockTemplate* pblocktemplate);
+
 
     /** Construct a new block template */
     std::unique_ptr<CBlockTemplate> CreateNewBlock();

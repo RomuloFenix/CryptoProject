@@ -40,6 +40,7 @@
 #include <primitives/block.h>
 #include <primitives/transaction.h>
 #include <random.h>
+#include <sync.h>
 #include <script/script.h>
 #include <script/sigcache.h>
 #include <signet.h>
@@ -113,6 +114,10 @@ const std::vector<std::string> CHECKLEVEL_DOC {
  *  noticeably interfere with the pruning mechanism.
  * */
 static constexpr int PRUNE_LOCK_BUFFER{10};
+
+// Validation Nodes
+std::map<uint256, ActiveNode> mapActivesNodes;
+RecursiveMutex cs_activenodes;
 
 TRACEPOINT_SEMAPHORE(validation, block_connected);
 TRACEPOINT_SEMAPHORE(utxocache, flush);

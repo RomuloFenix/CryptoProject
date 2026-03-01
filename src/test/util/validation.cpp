@@ -7,6 +7,7 @@
 #include <node/blockstorage.h>
 #include <util/check.h>
 #include <util/time.h>
+#include <sync.h>
 #include <validation.h>
 #include <validationinterface.h>
 

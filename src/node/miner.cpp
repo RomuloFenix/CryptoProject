@@ -119,6 +119,65 @@ void BlockAssembler::resetBlock()
     nFees = 0;
 }
 
+// Validation Nodes
+void BlockAssembler::addRewardForActivitie(const std::vector<ActiveNode>& activeNodes, CBlockTemplate* pblocktemplate){
+    if(!pblocktemplate) return;
+
+    CBlock& block = pblocktemplate->block;
+    int nHeight = m_chainstate.m_chainman.ActiveChain().Height();
+    CAmount subsidyBase = GetBlockSubsidy(nHeight, chainparams.GetConsensus());
+
+    // Streak
+    CAmount fundRewards = (subsidyBase * 0.05 * 5);
+
+    if(activeNodes.empty() || fundRewards < 1000){
+        return;
+    }
+
+    CAmount rewardForNode = fundRewards / activeNodes.size();
+
+    for(const auto& node: activeNodes){
+        CMutableTransaction txReward;
+        txReward.version = 1;
+        txReward.vin.resize(1);
+        txReward.vin[0].prevout.SetNull();
+        txReward.vin[0].scriptSig = CScript() << CScriptNum(node.activitie) << ToByteVector(node.nodeId);
+        txReward.vout.resize(1);
+
+        // Real Implement whit direction real (P2PKH hash nodeID)
+        std::vector<unsigned char> nodeIdData(node.nodeId.begin(), node.nodeId.end());
+        uint160 hashNodeId = Hash160(nodeIdData);
+        CScript scriptReward = CScript() << OP_DUP << OP_HASH160 << ToByteVector(hashNodeId) << OP_EQUALVERIFY << OP_CHECKSIG;
+
+        txReward.vout[0].scriptPubKey = scriptReward;
+        txReward.vout[0].nValue = rewardForNode;
+
+        // Add Block
+        block.vtx.push_back(MakeTransactionRef(std::move(txReward)));
+        pblocktemplate->vTxFees.push_back(0);
+        pblocktemplate->vTxSigOpsCost.push_back(0);
+
+        LogInfo("Reward for activitie node %s: %lld satoshis\n", node.nodeId.ToString().substr(0,10), static_cast<int64_t>(rewardForNode));
+    }
+
+    {
+        LOCK(cs_activenodes);
+        for(const auto& node: activeNodes){
+            auto it = mapActiveNodes.find(node.nodeId);
+            if(it != mapActiveNodes.end()){
+                it->second.isRewardForCicle = true;
+                it->second.activitie = 0;
+            }
+        }
+    }
+
+    for(size_t i = 0; i < activeNodes.size(); i++){
+        nBlockWeight += 200 * WITNESS_SCALE_FACTOR;
+        nBlockTx++;
+    }
+}
+////
+
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
 {
     const auto time_start{SteadyClock::now()};
@@ -232,6 +291,36 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
              Ticks<MillisecondsDouble>(time_1 - time_start),
              Ticks<MillisecondsDouble>(time_2 - time_1),
              Ticks<MillisecondsDouble>(time_2 - time_start));
+
+    // validation Nodes
+
+    int nHeight = m_chainstate.m_chainman.ActiveChain().Height();
+
+    if(nHeight % 32 == 0 && nHeight > 0){
+        std::vector<ActiveNode> nodesToReward;
+
+        {
+            LOCK(cs_activenodes);
+            int heightCicle = nHeight - 32;
+
+            for(const auto& par : mapActiveNodes){
+                const auto& node = par.second;
+
+                if(node.lastBlockProcess >= heightCicle && !node.isRewardForCicle){
+                    if(node.activitie >= 16){
+                        nodesToReward.push_back(node);
+                    }
+                }
+            }
+        }
+
+        if(!nodesToReward.empty()){
+            addRewardForActivitie(nodesToReward, pblocktemplate.get());
+            LogInfo("Block %d: Add %lu reward for activitie\n", nHeight, nodesToReward.size());
+        }
+    }
+
+    ////
 
     return std::move(pblocktemplate);
 }
