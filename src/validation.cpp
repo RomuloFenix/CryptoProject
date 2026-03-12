@@ -116,7 +116,7 @@ const std::vector<std::string> CHECKLEVEL_DOC {
 static constexpr int PRUNE_LOCK_BUFFER{10};
 
 // Validation Nodes
-std::map<uint256, ActiveNode> mapActivesNodes;
+std::map<uint256, ActiveNode> mapActiveNodes;
 RecursiveMutex cs_activenodes;
 
 TRACEPOINT_SEMAPHORE(validation, block_connected);

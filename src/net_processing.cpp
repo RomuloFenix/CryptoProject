@@ -3554,6 +3554,44 @@ void PeerManagerImpl::ProcessMessage(Peer& peer, CNode& pfrom, const std::string
 
     LogDebug(BCLog::NET, "received: %s (%u bytes) peer=%d\n", SanitizeString(msg_type), vRecv.size(), pfrom.GetId());
 
+    // Validation Nodes
+    {
+        LOCK(cs_activenodes);
+        NodeId id = pfrom.GetId();
+        uint256 nodeId;
+        memcpy(nodeId.begin(), &id, sizeof(id));
+        //uint256 nodeId = uint256S(std::to_string(node.GetId()));
+        LogInfo("Debug: Processing Messages %s node: %s", msg_type.c_str(), nodeId.ToString().substr(0,10).c_str());
+
+        if(mapActiveNodes.find(nodeId) == mapActiveNodes.end()){
+            ActiveNode newNode;
+            newNode.nodeId = nodeId;
+            newNode.direccionIP = pfrom.GetAddrLocal().ToStringAddrPort();
+            newNode.lastBlockProcess = m_chainman.ActiveChain().Height();
+            newNode.activitie = 1;
+            newNode.activeBlocks = 1;
+            newNode.isRewardForCicle = false;
+            mapActiveNodes[nodeId] = newNode;
+            LogInfo("DEBUG: New Node Register - ip: %s", newNode.direccionIP.c_str());
+        } else{
+            auto& findNode = mapActiveNodes[nodeId];
+            int actualHeight = m_chainman.ActiveChain().Height();
+
+            if(actualHeight > findNode.lastBlockProcess){
+                findNode.activitie++;
+                findNode.activeBlocks = actualHeight - findNode.lastBlockProcess;
+                findNode.lastBlockProcess = actualHeight;
+
+                LogInfo("DEBUG: Node Active - activitie: %d", findNode.activitie);
+
+                if(actualHeight % 32 == 0){
+                    findNode.isRewardForCicle = false;
+                }
+            }
+        }
+    }
+
+    ////
 
     if (msg_type == NetMsgType::VERSION) {
         if (pfrom.nVersion != 0) {
@@ -5239,40 +5277,7 @@ bool PeerManagerImpl::ProcessMessages(CNode& node, std::atomic<bool>& interruptM
         CaptureMessage(node.addr, msg.m_type, MakeUCharSpan(msg.m_recv), /*is_incoming=*/true);
     }
 
-    // Validation Nodes
-    {
-        LOCK(cs_activenodes);
-        NodeId id = node.GetId();
-        uint256 nodeId;
-        memcpy(nodeId.begin(), &id, sizeof(id));
-        //uint256 nodeId = uint256S(std::to_string(node.GetId()));
 
-        if(mapActiveNodes.find(nodeId) == mapActiveNodes.end()){
-            ActiveNode newNode;
-            newNode.nodeId = nodeId;
-            newNode.direccionIP = node.GetAddrLocal().ToStringAddrPort();
-            newNode.lastBlockProcess = m_chainman.ActiveChain().Height();
-            newNode.activitie = 1;
-            newNode.activeBlocks = 1;
-            newNode.isRewardForCicle = false;
-            mapActiveNodes[nodeId] = newNode;
-        } else{
-            auto& findNode = mapActiveNodes[nodeId];
-            int actualHeight = m_chainman.ActiveChain().Height();
-
-            if(actualHeight > findNode.lastBlockProcess){
-                findNode.activitie++;
-                findNode.activeBlocks = actualHeight - findNode.lastBlockProcess;
-                findNode.lastBlockProcess = actualHeight;
-
-                if(actualHeight % 32 == 0){
-                    findNode.isRewardForCicle = false;
-                }
-            }
-        }
-    }
-
-    ////
 
     try {
         ProcessMessage(peer, node, msg.m_type, msg.m_recv, msg.m_time, interruptMsgProc);

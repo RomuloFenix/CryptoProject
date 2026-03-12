@@ -120,6 +120,7 @@ void BlockAssembler::resetBlock()
 }
 
 // Validation Nodes
+
 void BlockAssembler::addRewardForActivitie(const std::vector<ActiveNode>& activeNodes, CBlockTemplate* pblocktemplate){
     if(!pblocktemplate) return;
 
@@ -295,6 +296,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
     // validation Nodes
 
     int nHeight = m_chainstate.m_chainman.ActiveChain().Height();
+    LogInfo("Height Chain: %d", nHeight);
 
     if(nHeight % 32 == 0 && nHeight > 0){
         std::vector<ActiveNode> nodesToReward;
@@ -317,6 +319,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock()
         if(!nodesToReward.empty()){
             addRewardForActivitie(nodesToReward, pblocktemplate.get());
             LogInfo("Block %d: Add %lu reward for activitie\n", nHeight, nodesToReward.size());
+        } else {
+            LogInfo("Active Nodes vector is Empty");
         }
     }
 
